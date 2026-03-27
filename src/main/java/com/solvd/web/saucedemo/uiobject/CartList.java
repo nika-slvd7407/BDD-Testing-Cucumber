@@ -12,10 +12,10 @@ import java.util.List;
 
 public class CartList extends AbstractUIObject {
 
-    @FindBy(xpath = ".//*[contains(@class, 'cart_item')]")
-    private List<ExtendedWebElement> cartItems;
+    @FindBy(xpath = ".//*[contains(@class,'cart_item')]")
+    private List<ExtendedWebElement> items;
 
-    @FindBy(xpath = ".//*[contains(@data-test, 'checkout']")
+    @FindBy(xpath = ".//*[contains(@data-test,'checkout')]")
     private ExtendedWebElement checkoutButton;
 
     public CartList(WebDriver driver, SearchContext searchContext) {
@@ -23,20 +23,30 @@ public class CartList extends AbstractUIObject {
     }
 
     private ExtendedWebElement getItem(int index) {
-        return cartItems.get(index);
+        return items.get(index);
     }
 
     public String getItemName(int index) {
-        return getItem(index).findElement(By.xpath(".//*[contains(@class, 'inventory_item_name')]")).getText().toLowerCase();
+        return getItem(index)
+                .findElement(By.xpath(".//*[contains(@class,'inventory_item_name')]"))
+                .getText()
+                .toLowerCase();
     }
 
-    public Double getItemCost(int index) {
+    public Double getItemPrice(int index) {
         return Double.valueOf(
-                getItem(index).findElement(By.xpath(".//*[contains(@class, 'inventory_item_price')]")).getText().substring(1)
+                getItem(index)
+                        .findElement(By.xpath(".//*[contains(@class,'inventory_item_price')]"))
+                        .getText()
+                        .substring(1)
         );
     }
 
-    public CheckoutPage pressCheckout() {
+    public int size() {
+        return items.size();
+    }
+
+    public CheckoutPage checkout() {
         checkoutButton.click();
         return new CheckoutPage(getDriver());
     }

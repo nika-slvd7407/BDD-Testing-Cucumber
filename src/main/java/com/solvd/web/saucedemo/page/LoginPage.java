@@ -23,9 +23,7 @@ public class LoginPage extends AbstractPage {
 
     public MainPage login() throws InterruptedException {
         this.getLoginForm().inputUsername(R.TESTDATA.get("saucedemo_username"));
-        Thread.sleep(1000);
         this.getLoginForm().inputPassword(R.TESTDATA.get("saucedemo_password"));
-        Thread.sleep(1000);
         return this.getLoginForm().pressLogin();
     }
 

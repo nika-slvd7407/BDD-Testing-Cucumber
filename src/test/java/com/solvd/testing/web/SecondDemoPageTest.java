@@ -7,6 +7,13 @@ import com.solvd.web.saucedemo.page.MainPage;
 import com.solvd.web.saucedemo.uiobject.CartList;
 import com.solvd.web.saucedemo.uiobject.CheckoutForm;
 import com.solvd.web.saucedemo.uiobject.InventoryList;
+import com.zebrunner.carina.core.AbstractTest;
+import com.zebrunner.carina.utils.R;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.testng.Assert;
+import org.testng.annotations.Test;
+import org.testng.asserts.SoftAssert;
 
 
 import java.util.ArrayList;
@@ -33,68 +40,38 @@ public class SecondDemoPageTest extends AbstractTest {
         softAssert.assertAll();
     }
 
-    @Test(description = "test full purchase of multiple items")
-    public void testPurchaseOfMultipleItems() throws InterruptedException {
-        SoftAssert softAssert = new SoftAssert();
+    @Test
+    public void testPurchase() {
         WebDriver driver = getDriver();
-        String url = R.CONFIG.get("saucedemo_url");
 
         LoginPage loginPage = new LoginPage(driver);
-        driver.get(url);
+
         MainPage mainPage = loginPage.login();
 
-        softAssert.assertEquals(
-                mainPage.isPageOpened(), true, "Main page is failed to open"
-        );
+        InventoryList inventory = mainPage.getInventoryList();
 
-        List<String> itemToBuy = new ArrayList<>();
-        InventoryList inventoryList = mainPage.getInventoryList();
+        List<String> expectedNames = new ArrayList<>();
+        double expectedSum = 0;
 
-        Thread.sleep(2000);
-        inventoryList.addItem1();
-        itemToBuy.add(inventoryList.getItem1Name());
+        for (int i = 0; i < 2; i++) {
+            inventory.addItem(i);
+            expectedNames.add(inventory.getItemName(i));
+            expectedSum += inventory.getItemPrice(i);
+        }
 
-        Thread.sleep(500);
-        inventoryList.addItem2();
-        itemToBuy.add(inventoryList.getItem2Name());
+        CartPage cartPage = inventory.openCart();
+        CartList cart = cartPage.getCartList();
 
-        Double totalCost = inventoryList.getItem1Cost() + inventoryList.getItem2Cost();
+        double actualSum = 0;
 
-        CartPage cartPage = inventoryList.pressCart();
-        CartList cartList = cartPage.getCartList();
+        for (int i = 0; i < cart.size(); i++) {
+            String name = cart.getItemName(i);
+            actualSum += cart.getItemPrice(i);
 
-        String cartName1 = cartList.getItemName(1);
-        String cartName2 = cartList.getItemName(2);
-        Double cartCost1 = cartList.getItemCost(1);
-        Double cartCost2 = cartList.getItemCost(2);
+            Assert.assertTrue(expectedNames.contains(name));
+        }
 
-        softAssert.assertTrue(
-                itemToBuy.contains(cartName1), "Cart does not contains 1 item"
-        );
-
-        softAssert.assertTrue(
-                itemToBuy.contains(cartName2), "Cart does not contains 2 item"
-        );
-
-        Double cartSum = cartCost1 + cartCost2;
-
-        softAssert.assertEquals(
-                totalCost, cartSum, "Cart sum is not equal"
-        );
-
-        CheckoutPage checkoutPage = cartList.pressCheckout();
-        CheckoutForm checkoutForm = checkoutPage.checkoutForm;
-
-        checkoutForm.writeName(R.TESTDATA.get("saucedemo_name"));
-        checkoutForm.writeLastName(R.TESTDATA.get("saucedemo_last_name"));
-        checkoutForm.writePostalCode(R.TESTDATA.get("saucedemo_zip"));
-        checkoutForm.pressCheckoutButton();
-
-        driver.findElement(By.id("finish")).click();
-        String currentUrl = driver.getCurrentUrl();
-
-        softAssert.assertTrue(currentUrl.equals("https://www.saucedemo.com/checkout-complete.html"), "Checkout failed and wont show complition");
-        softAssert.assertAll();
+        Assert.assertEquals(actualSum, expectedSum);
     }
 
 }

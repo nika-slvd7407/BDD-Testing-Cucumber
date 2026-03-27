@@ -13,8 +13,7 @@ public class MainPage extends AbstractPage {
 
     public MainPage(WebDriver driver) {
         super(driver);
-        setPageOpeningStrategy(PageOpeningStrategy.BY_URL);
-        setPageAbsoluteURL("https://www.saucedemo.com/inventory.html");
+        setPageOpeningStrategy(PageOpeningStrategy.BY_ELEMENT);
     }
 
     public InventoryList getInventoryList() {

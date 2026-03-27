@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.solvd.web.saucedemo.db.OrderMapper">
+
+    <resultMap id="OrderResultMap" type="com.solvd.db.web.model.Order">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="productName" column="product_name"/>
+    </resultMap>
+
+    <select id="getOrdersByUserId" resultMap="OrderResultMap">
+        SELECT id,
+        user_id,
+        product_name
+        FROM orders
+        WHERE user_id = #{userId}
+    </select>
+
+</mapper>

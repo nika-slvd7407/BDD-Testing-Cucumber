@@ -8,61 +8,48 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
 
+import java.util.List;
+
 public class InventoryList extends AbstractUIObject {
 
-    @FindBy(xpath = "(.//*[contains (@class, 'inventory_item_description')])[1]")
-    private ExtendedWebElement item1;
+    @FindBy(xpath = ".//*[contains(@class,'inventory_item')]")
+    private List<ExtendedWebElement> items;
 
-    @FindBy(xpath = "(.//*[contains (@class, 'inventory_item_description')])[2]")
-    private ExtendedWebElement item2;
-
-    @FindBy(xpath = "//*[contains (@class, 'shopping_cart_link')]")
-    private ExtendedWebElement checkoutButton;
+    @FindBy(xpath = "//*[contains(@class,'shopping_cart_link')]")
+    private ExtendedWebElement cartButton;
 
     public InventoryList(WebDriver driver, SearchContext searchContext) {
         super(driver, searchContext);
     }
 
-    public String getItem1Name() {
-        return getItem1().findElement(By.xpath(".//*[contains (@data-test, 'inventory-item-name')]")).getText().toLowerCase();
+    private ExtendedWebElement getItem(int index) {
+        return items.get(index);
     }
 
-    public String getItem2Name() {
-        return getItem2().findElement(By.xpath(".//*[contains (@data-test, 'inventory-item-name')]")).getText().toLowerCase();
+    public String getItemName(int index) {
+        return getItem(index)
+                .findElement(By.xpath(".//*[contains(@data-test,'inventory-item-name')]"))
+                .getText()
+                .toLowerCase();
     }
 
-    public Double getItem1Cost() {
-        return Double.valueOf(getItem1().findElement(By.xpath(".//*[contains (@data-test, 'inventory-item-price')]")).getText().substring(1));
+    public Double getItemPrice(int index) {
+        return Double.valueOf(
+                getItem(index)
+                        .findElement(By.xpath(".//*[contains(@data-test,'inventory-item-price')]"))
+                        .getText()
+                        .substring(1)
+        );
     }
 
-    public Double getItem2Cost() {
-        return Double.valueOf(getItem2().findElement(By.xpath(".//*[contains (@data-test, 'inventory-item-price')]")).getText().substring(1));
+    public void addItem(int index) {
+        getItem(index)
+                .findElement(By.xpath(".//*[contains(@name,'add-to-cart')]"))
+                .click();
     }
 
-    public void addItem1() {
-        item1.findElement(By.xpath(".//*[contains (@name, 'add-to-cart')]")).click();
-    }
-
-    public void addItem2() {
-        item2.hover();
-        item2.findElement(By.xpath(".//*[contains (@name, 'add-to-cart')]")).click();
-    }
-
-    public ExtendedWebElement getItem1() {
-        return item1;
-    }
-
-    public ExtendedWebElement getItem2() {
-        return item2;
-    }
-
-    public CartPage pressCart() {
-        getCheckoutButton().hover();
-        getCheckoutButton().click();
+    public CartPage openCart() {
+        cartButton.click();
         return new CartPage(driver);
-    }
-
-    public ExtendedWebElement getCheckoutButton() {
-        return checkoutButton;
     }
 }
